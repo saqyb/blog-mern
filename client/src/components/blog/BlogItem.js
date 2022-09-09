@@ -80,8 +80,8 @@ const BlogItem = (props) => {
             <NavLink to={"/author"} state={Author.ID}>
               <a className='inline-flex items-center'>
                 <img
-                  alt='blog'
-                  src={Author.DP}
+                  alt={Author.DP}
+                  src={`users/${Author.DP ? Author.DP : "placeholder.png"}`}
                   className='w-12 h-12 rounded-full flex-shrink-0 object-cover object-center'
                 />
                 <span className='flex-grow flex flex-col pl-4'>

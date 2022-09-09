@@ -39,38 +39,6 @@ const EditBlog = () => {
       .patch("/blogs", formData)
       .then((res) => console.log(res.data))
       .catch((err) => console.log(err));
-    // const { userId, id, categoryID, title, body } = blog;
-
-    // try {
-    //   const res = await fetch("/blogs", {
-    //     method: "PATCH",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       userId,
-    //       id,
-    //       categoryID,
-    //       title,
-    //       body,
-    //     }),
-    //   });
-
-    //   const data = await res.json();
-    //   if (res.status === 200) {
-    //     setBlogs(data);
-    //     // console.log(data);
-    //   } else {
-    //     console.log("Failed to Update Blog");
-    //   }
-    //   console.log("status code: ", res.status); // 200
-    //   if (!res.ok) {
-    //     console.log(res);
-    //     throw new Error(`Error! status: ${res.status}`);
-    //   }
-    // } catch (err) {
-    //   console.log(err);
-    // }
   };
 
   const saveBlog = (e) => {

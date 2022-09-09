@@ -8,6 +8,21 @@ const authenticate = require("../middleware/authenticate");
 require("../db/conn");
 const User = require("../model/userSchema");
 router.use(cookieParser());
+const multer = require("multer");
+const fs = require("fs");
+var imageName = null;
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, "../client/public/users");
+  },
+  filename: (req, file, callback) => {
+    const replaced = file.originalname.replaceAll(" ", "-");
+    imageName = Date.now() + replaced;
+    callback(null, imageName);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 router.get("/authenticate", authenticate, (req, res) => {
   // console.log("About page from Auth");
@@ -35,6 +50,7 @@ router.get("/authors", async (req, res) => {
           Name: 1,
           email: 1,
           blogsID: 1,
+          DP: 1,
         }
       );
       if (authors) {
@@ -61,7 +77,14 @@ router.post("/register", async (req, res) => {
     } else if (password != cpassword) {
       return res.status(422).json({ error: "Passwords Dont Match" });
     } else {
-      const user = new User({ ID, Name, email, password, cpassword });
+      const user = new User({
+        ID,
+        Name,
+        email,
+        password,
+        cpassword,
+        DP: null,
+      });
       const userRegistered = await user.save();
       if (userRegistered) {
         return res
@@ -99,6 +122,55 @@ router.post("/signin", async (req, res) => {
       }
     } else {
       return res.status(500).json({ error: "User Not Found" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+// Patch Users
+
+router.patch("/user", upload.single("DP"), async (req, res) => {
+  const { ID, Name, email, DP, BIO, password, cpassword } = req.body;
+  if (req.file) {
+    var post = {
+      ID,
+      Name,
+      email,
+      DP: imageName,
+      BIO,
+    };
+    const user = await User.findOne({ ID: ID });
+    if (user.DP) {
+      await fs.unlink("../client/public/users/" + user.DP, (err) => {
+        //delete file from directory
+        if (err) console.log(err);
+        else {
+          console.log("file deleted");
+        }
+      });
+    }
+  } else {
+    var post = {
+      ID,
+      Name,
+      email,
+      BIO,
+    };
+  }
+
+  if (!ID || !Name || !email || !BIO) {
+    res.status(422).json({ error: "Plz send complete data" });
+  }
+  try {
+    const user = await User.findOneAndUpdate({ ID: ID }, post);
+
+    //   const blog = new Blog({ userId, id, categoryID, title, body });
+    // const blogSaved = await blog.save();
+    if (user) {
+      return res.status(201).json({ message: "Profile Updated Successfully" });
+    } else {
+      return res.status(500).json({ error: "Failed to Update Profile" });
     }
   } catch (err) {
     console.log(err);
