@@ -51,6 +51,7 @@ router.get("/authors", async (req, res) => {
           email: 1,
           blogsID: 1,
           DP: 1,
+          BIO: 1,
         }
       );
       if (authors) {
